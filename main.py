@@ -120,19 +120,19 @@ def eval(model, dataloader):
     return np.array(scores), z
 
 
-scores, z = eval(model, train_loader)
-t = scores.max()
+train_scores, z = eval(model, train_loader)
+threshold = train_scores.max()
 
-scores_, z_ = eval(model, test_loader)
+test_scores, z_ = eval(model, test_loader)
 
 
-def get_pred_label(model_pred, t):
-    model_pred = np.where(model_pred <= t, 0, model_pred)
-    model_pred = np.where(model_pred > t, 1, model_pred)
+def get_pred_label(model_pred, threshold):
+    model_pred = np.where(model_pred <= threshold, 0, model_pred)
+    model_pred = np.where(model_pred > threshold, 1, model_pred)
     return model_pred
 
 
-test_pred = get_pred_label(scores_, t)
+test_pred = get_pred_label(test_scores, threshold)
 submit = pd.read_csv('./sample_submission.csv')
 submit['LABEL'] = test_pred
 submit.to_csv('./result.csv', index=False)
